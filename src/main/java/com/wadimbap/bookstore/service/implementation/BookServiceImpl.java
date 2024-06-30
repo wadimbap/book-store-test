@@ -4,7 +4,9 @@ import com.wadimbap.bookstore.exception.BookNotFoundException;
 import com.wadimbap.bookstore.model.Book;
 import com.wadimbap.bookstore.repository.BookRepository;
 import com.wadimbap.bookstore.service.BookService;
+import com.wadimbap.bookstore.specification.BookSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,25 +35,12 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> getFilteredBooks(String title, String isbn, Long authorId) {
-        if (title != null && isbn != null && authorId != null) {
-            // Фильтрация по наименованию, ISBN и автору
-            return bookRepository.findByTitleContainingAndISBNContainingAndAuthorsId(title, isbn, authorId);
-        } else if (title != null && isbn != null) {
-            // Фильтрация по наименованию и ISBN
-            return bookRepository.findByTitleContainingAndISBNContaining(title, isbn);
-        } else if (title != null) {
-            // Фильтрация по наименованию
-            return bookRepository.findByTitleContaining(title);
-        } else if (isbn != null) {
-            // Фильтрация по ISBN
-            return bookRepository.findByISBNContaining(isbn);
-        } else if (authorId != null) {
-            // Фильтрация по автору
-            return bookRepository.findByAuthorsId(authorId);
-        } else {
-            // Возвращаем все книги, если фильтры не указаны
-            return getAllBooks();
-        }
+        return bookRepository.findAll(
+                Specification
+                        .where(BookSpecification.hasTitle(title))
+                        .and(BookSpecification.hasISBN(isbn))
+                        .and(BookSpecification.hasAuthorId(authorId))
+                );
     }
 
     @Override
