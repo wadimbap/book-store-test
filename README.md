@@ -1,4 +1,4 @@
-### Проект Bookstore API
+### Проект Bookstore
 
 1. **О проекте:**
    Проект Bookstore API представляет собой RESTful API для управления книгами и авторами в книжном магазине.
@@ -52,5 +52,3 @@
          ```bash
          curl -X POST -H "Content-Type: application/json" -d '{ "name": "Имя автора" }' http://localhost:8080/api/author
          ```
-
-   После успешного запуска и проверки API вы можете начать использовать и тестировать функциональность вашего проекта Bookstore API.
