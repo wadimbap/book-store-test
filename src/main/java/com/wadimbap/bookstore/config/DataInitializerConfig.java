@@ -13,10 +13,12 @@ public class DataInitializerConfig {
 
     @Bean
     public DataSourceInitializer dataSourceInitializer(DataSource dataSource) {
-        ResourceDatabasePopulator populator = new ResourceDatabasePopulator(new ClassPathResource("data.sql"));
-        DataSourceInitializer initializer = new DataSourceInitializer();
-        initializer.setDataSource(dataSource);
-        initializer.setDatabasePopulator(populator);
-        return initializer;
+        return new DataSourceInitializer() {
+            {
+                setDataSource(dataSource);
+                setDatabasePopulator(new ResourceDatabasePopulator(new ClassPathResource("data.sql")));
+            }
+        };
     }
 }
+
