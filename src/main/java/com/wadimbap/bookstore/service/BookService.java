@@ -1,5 +1,6 @@
 package com.wadimbap.bookstore.service;
 
+import com.wadimbap.bookstore.dto.BookDTO;
 import com.wadimbap.bookstore.exception.BookNotFoundException;
 import com.wadimbap.bookstore.model.Book;
 
@@ -9,13 +10,13 @@ import java.util.Optional;
 public interface BookService {
     Book saveBook(Book book);
 
-    Optional<Book> getBookById(Long bookId);
+    Optional<BookDTO> getBookById(Long bookId);
 
-    List<Book> getAllBooks();
+    List<BookDTO> getAllBooks();
 
-    List<Book> getFilteredBooks(String title, String isbn, Long authorId);
+    List<BookDTO> getFilteredBooks(String title, String isbn, Long authorId);
 
-    Book updateBook(Long bookId, Book book) throws BookNotFoundException;
+    BookDTO updateBook(Long bookId, Book book) throws BookNotFoundException;
 
     void deleteBook(Long bookId) throws BookNotFoundException;
 }

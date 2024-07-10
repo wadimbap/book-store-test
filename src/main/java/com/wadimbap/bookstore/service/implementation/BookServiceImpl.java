@@ -1,5 +1,7 @@
 package com.wadimbap.bookstore.service.implementation;
 
+import com.wadimbap.bookstore.converter.DTOConverter;
+import com.wadimbap.bookstore.dto.BookDTO;
 import com.wadimbap.bookstore.exception.BookNotFoundException;
 import com.wadimbap.bookstore.model.Book;
 import com.wadimbap.bookstore.repository.BookRepository;
@@ -11,12 +13,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
+    private final DTOConverter dtoConverter;
 
     @Override
     public Book saveBook(Book book) {
@@ -24,32 +28,40 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Optional<Book> getBookById(Long bookId) {
-        return bookRepository.findById(bookId);
+    public Optional<BookDTO> getBookById(Long bookId) {
+        return bookRepository.findById(bookId).map(dtoConverter::convertToBookDTO);
     }
 
     @Override
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+    public List<BookDTO> getAllBooks() {
+        return bookRepository
+                .findAll()
+                .stream()
+                .map(dtoConverter::convertToBookDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Book> getFilteredBooks(String title, String isbn, Long authorId) {
+    public List<BookDTO> getFilteredBooks(String title, String isbn, Long authorId) {
         return bookRepository.findAll(
                 Specification
                         .where(BookSpecification.hasTitle(title))
                         .and(BookSpecification.hasISBN(isbn))
                         .and(BookSpecification.hasAuthorId(authorId))
-                );
+                )
+                .stream()
+                .map(dtoConverter::convertToBookDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Book updateBook(Long bookId, Book bookDetails) throws BookNotFoundException {
+    public BookDTO updateBook(Long bookId, Book bookDetails) throws BookNotFoundException {
         Book book = findBookOrThrowException(bookId);
         book.setAuthors(bookDetails.getAuthors());
         book.setTitle(bookDetails.getTitle());
         book.setISBN(bookDetails.getISBN());
-        return bookRepository.save(book);
+        Book updatedBook = bookRepository.save(book);
+        return dtoConverter.convertToBookDTO(updatedBook);
     }
 
     @Override

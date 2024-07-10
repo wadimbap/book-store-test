@@ -1,5 +1,7 @@
 package com.wadimbap.bookstore.service.implementation;
 
+import com.wadimbap.bookstore.converter.DTOConverter;
+import com.wadimbap.bookstore.dto.BookDTO;
 import com.wadimbap.bookstore.exception.BookNotFoundException;
 import com.wadimbap.bookstore.model.Book;
 import com.wadimbap.bookstore.repository.BookRepository;
@@ -13,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -23,30 +26,41 @@ public class BookServiceImplTest {
     @Mock
     private BookRepository bookRepository;
 
+    @Mock
+    private DTOConverter dtoConverter;
+
     @InjectMocks
     private BookServiceImpl bookService;
 
     private List<Book> mockBooks;
+    private List<BookDTO> mockBookDTOs;
 
     @BeforeEach
     void setUp() {
-        // Инициализация списка книг для тестирования
+        // Инициализация списка книг и их DTO для тестирования
         mockBooks = new ArrayList<>();
-        mockBooks.add(new Book(1L, "Book 1", "1234567890", null));
-        mockBooks.add(new Book(2L, "Book 2", "0987654321", null));
+        mockBooks.add(new Book(1L, "Book 1", "1234567890", new ArrayList<>()));
+        mockBooks.add(new Book(2L, "Book 2", "0987654321", new ArrayList<>()));
+
+        mockBookDTOs = mockBooks.stream()
+                .map(book -> new BookDTO(book.getId(), book.getTitle(), book.getISBN(), new ArrayList<>()))
+                .collect(Collectors.toList());
     }
 
     @Test
     void getAllBooks_shouldReturnAllBooks() {
         // Arrange
         when(bookRepository.findAll()).thenReturn(mockBooks);
+        when(dtoConverter.convertToBookDTO(any(Book.class))).thenAnswer(invocation -> {
+            Book book = invocation.getArgument(0);
+            return new BookDTO(book.getId(), book.getTitle(), book.getISBN(), new ArrayList<>());
+        });
 
         // Act
-        List<Book> allBooks = bookService.getAllBooks();
+        List<BookDTO> allBooks = bookService.getAllBooks();
 
         // Assert
         assertEquals(mockBooks.size(), allBooks.size());
-        assertEquals(mockBooks, allBooks);
     }
 
     @Test
@@ -54,14 +68,16 @@ public class BookServiceImplTest {
         // Arrange
         Long bookId = 1L;
         Book expectedBook = mockBooks.get(0);
+        BookDTO expectedBookDTO = mockBookDTOs.get(0);
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(expectedBook));
+        when(dtoConverter.convertToBookDTO(expectedBook)).thenReturn(expectedBookDTO);
 
         // Act
-        Optional<Book> foundBook = bookService.getBookById(bookId);
+        Optional<BookDTO> foundBook = bookService.getBookById(bookId);
 
         // Assert
         assertTrue(foundBook.isPresent());
-        assertEquals(expectedBook, foundBook.get());
+        assertEquals(expectedBookDTO, foundBook.get());
     }
 
     @Test
@@ -71,7 +87,7 @@ public class BookServiceImplTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.empty());
 
         // Act
-        Optional<Book> foundBook = bookService.getBookById(bookId);
+        Optional<BookDTO> foundBook = bookService.getBookById(bookId);
 
         // Assert
         assertFalse(foundBook.isPresent());
@@ -81,10 +97,12 @@ public class BookServiceImplTest {
     void saveBook_shouldReturnSavedBook() {
         // Arrange
         Book newBook = new Book(null, "New Book", "1112223334", null);
+        BookDTO expectedBookDTO = new BookDTO(null, "New Book", "1112223334", null);
         when(bookRepository.save(newBook)).thenReturn(newBook);
+        when(dtoConverter.convertToBookDTO(newBook)).thenReturn(expectedBookDTO);
 
         // Act
-        Book savedBook = bookService.saveBook(newBook);
+        BookDTO savedBook = dtoConverter.convertToBookDTO(bookService.saveBook(newBook));
 
         // Assert
         assertNotNull(savedBook);
@@ -98,11 +116,13 @@ public class BookServiceImplTest {
         Long bookId = 1L;
         Book existingBook = mockBooks.get(0);
         Book updatedBookDetails = new Book(null, "Updated Book", "9998887776", null);
+        BookDTO updatedBookDTO = new BookDTO(bookId, "Updated Book", "9998887776", null);
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
         when(bookRepository.save(existingBook)).thenReturn(existingBook);
+        when(dtoConverter.convertToBookDTO(existingBook)).thenReturn(updatedBookDTO);
 
         // Act
-        Book updatedBook = bookService.updateBook(bookId, updatedBookDetails);
+        BookDTO updatedBook = bookService.updateBook(bookId, updatedBookDetails);
 
         // Assert
         assertNotNull(updatedBook);

@@ -1,5 +1,6 @@
 package com.wadimbap.bookstore.controller;
 
+import com.wadimbap.bookstore.dto.BookDTO;
 import com.wadimbap.bookstore.exception.BookNotFoundException;
 import com.wadimbap.bookstore.model.Book;
 import com.wadimbap.bookstore.service.BookService;
@@ -19,18 +20,18 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
-    public List<Book> getAllBooks() {
+    public List<BookDTO> getAllBooks() {
         return bookService.getAllBooks();
     }
 
     @GetMapping("/{bookId}")
-    public ResponseEntity<Optional<Book>> getBookById(@PathVariable Long bookId) {
-        Optional<Book> book = bookService.getBookById(bookId);
+    public ResponseEntity<Optional<BookDTO>> getBookById(@PathVariable Long bookId) {
+        Optional<BookDTO> book = bookService.getBookById(bookId);
         return ResponseEntity.ok(book);
     }
 
     @GetMapping("/filter")
-    public List<Book> getFilteredBooks(
+    public List<BookDTO> getFilteredBooks(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String isbn,
             @RequestParam(required = false) Long authorId) {
@@ -43,14 +44,16 @@ public class BookController {
     }
 
     @PutMapping("/{bookId}")
-    public ResponseEntity<Book> updateBook(@PathVariable Long bookId,
-                                           @RequestBody Book bookDetails) throws BookNotFoundException {
-        Book updatedBook = bookService.updateBook(bookId, bookDetails);
+    public ResponseEntity<BookDTO> updateBook(@PathVariable Long bookId,
+                                              @RequestBody Book bookDetails)
+            throws BookNotFoundException {
+        BookDTO updatedBook = bookService.updateBook(bookId, bookDetails);
         return ResponseEntity.ok(updatedBook);
     }
 
     @DeleteMapping("/{bookId}")
-    public ResponseEntity<Long> deleteBook(@PathVariable Long bookId) throws BookNotFoundException {
+    public ResponseEntity<Long> deleteBook(@PathVariable Long bookId)
+            throws BookNotFoundException {
         bookService.deleteBook(bookId);
         return ResponseEntity.ok(bookId);
     }
