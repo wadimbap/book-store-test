@@ -22,7 +22,7 @@ public class Author {
     @ManyToMany
     @JsonIgnore
     @JoinTable(
-            name = "author_book",
+            name = "book_author",
             joinColumns = @JoinColumn(name = "author_id"),
             inverseJoinColumns = @JoinColumn(name = "book_id")
     )
