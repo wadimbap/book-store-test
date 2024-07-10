@@ -4,7 +4,6 @@ VALUES ('Leo Tolstoy'),
        ('Fyodor Dostoevsky'),
        ('Mark Twain');
 
--- Вставка данных в таблицу books
 INSERT INTO book (title, isbn)
 VALUES ('War and Peace', '9780140447934'),
        ('Anna Karenina', '9780199536061'),
@@ -15,9 +14,7 @@ VALUES ('War and Peace', '9780140447934'),
        ('Sense and Sensibility', '9780141439662'),
        ('The Adventures of Tom Sawyer', '9780143107332');
 
--- Связующая таблица для связи книг и авторов
--- Укажите соответствующие book_id и author_id для связей
-INSERT INTO author_book (book_id, author_id)
+INSERT INTO book_author (book_id, author_id)
 VALUES (1, 1), -- War and Peace - Leo Tolstoy
        (2, 1), -- Anna Karenina - Leo Tolstoy
        (3, 2), -- Pride and Prejudice - Jane Austen
