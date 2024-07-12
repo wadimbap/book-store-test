@@ -39,8 +39,9 @@ public class BookController {
     }
 
     @PostMapping
-    public Book saveBook(@RequestBody Book book) {
-        return bookService.saveBook(book);
+    public ResponseEntity<BookDTO> saveBook(@RequestBody Book book) {
+        BookDTO savedBook = bookService.saveBook(book);
+        return ResponseEntity.ok(savedBook);
     }
 
     @PutMapping("/{bookId}")

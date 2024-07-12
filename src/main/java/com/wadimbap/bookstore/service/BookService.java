@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookService {
-    Book saveBook(Book book);
+    BookDTO saveBook(Book book);
 
     Optional<BookDTO> getBookById(Long bookId);
 

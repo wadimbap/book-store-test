@@ -23,8 +23,9 @@ public class BookServiceImpl implements BookService {
     private final DTOConverter dtoConverter;
 
     @Override
-    public Book saveBook(Book book) {
-        return bookRepository.save(book);
+    public BookDTO saveBook(Book book) {
+        Book savedBook = bookRepository.save(book);
+        return dtoConverter.convertToBookDTO(savedBook);
     }
 
     @Override

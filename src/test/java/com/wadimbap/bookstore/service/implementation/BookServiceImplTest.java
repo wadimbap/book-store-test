@@ -102,7 +102,7 @@ public class BookServiceImplTest {
         when(dtoConverter.convertToBookDTO(newBook)).thenReturn(expectedBookDTO);
 
         // Act
-        BookDTO savedBook = dtoConverter.convertToBookDTO(bookService.saveBook(newBook));
+        BookDTO savedBook = bookService.saveBook(newBook);
 
         // Assert
         assertNotNull(savedBook);
